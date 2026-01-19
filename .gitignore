@@ -1,0 +1,28 @@
+# =========================
+# Playwright
+# =========================
+/playwright-report/
+/test-results/
+/trace.zip
+playwright-report.zip
+
+# =========================
+# Allure
+# =========================
+/allure-results/
+/allure-report/
+
+# =========================
+# Node.js
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Playwright Auth
+# =========================
+.playwright/
+storageState.json
+.apkVersion

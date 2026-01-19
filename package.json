@@ -1,0 +1,23 @@
+{
+  "name": "tmsautoivan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "PWDEBUG=1 npx playwright test --headed",
+    "test:report": "npx playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "allure-commandline": "^2.35.1",
+    "allure-playwright": "^3.4.3"
+  },
+  "dependencies": {
+    "uuid": "^13.0.0"
+  }
+}
