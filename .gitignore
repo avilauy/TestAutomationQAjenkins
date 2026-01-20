@@ -23,6 +23,8 @@ yarn-error.log*
 # =========================
 # Playwright Auth
 # =========================
-.playwright/
+.playwright/*
+!.playwright/global-setup.js
+
 storageState.json
 .apkVersion
