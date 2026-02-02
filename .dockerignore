@@ -1,0 +1,29 @@
+# Node
+node_modules
+npm-debug.log
+
+# Git
+.git
+.gitignore
+
+# Playwright browsers cache (NO el código)
+# .playwright   ❌ ELIMINADO
+
+# Reportes y resultados (volúmenes)
+allure-results
+allure-report
+playwright-report
+test-results
+playwright-report.zip
+
+# Evidencias
+**/*.png
+**/*.webm
+**/*.zip
+**/*.log
+
+# IDE / SO
+.vscode
+.idea
+.DS_Store
+Thumbs.db

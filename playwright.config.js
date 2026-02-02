@@ -31,11 +31,10 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
   },
 
-  // Reportes
-  reporter: [
-    ['html', { open: 'never' }],
-    ['allure-playwright'],
-  ],
+reporter: [
+  ['html', { open: 'never' }],
+  ['allure-playwright', { outputFolder: 'allure-results' }],
+],
 
   projects: [
     {
