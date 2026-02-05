@@ -12,7 +12,9 @@ module.exports = defineConfig({
   retries: 2,
 
   // Login técnico (una sola vez)
-  globalSetup: require.resolve('./.playwright/global-setup'),
+  //globalSetup: require.resolve('./.playwright/global-setup'),
+
+  globalSetup: undefined,
 
   testIgnore: [
     '**/global-setup.js',
