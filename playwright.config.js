@@ -9,10 +9,7 @@ module.exports = defineConfig({
   fullyParallel: false,
 
   timeout: 30 * 1000,
-  retries: 2,
-
-  // Login técnico (una sola vez)
-  //globalSetup: require.resolve('./.playwright/global-setup'),
+  retries: 0,
 
   globalSetup: undefined,
 
@@ -33,10 +30,23 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
   },
 
-reporter: [
-  ['html', { open: 'never' }],
-  ['allure-playwright', { outputFolder: 'allure-results' }],
-],
+  reporter: [
+    // HTML se genera por test mientras corre
+    ['html', { 
+      outputFolder: 'results/html-report', 
+      open: 'never',
+      emit: 'onTestEnd'   // 🔹 esto hace que se actualice mientras corren los tests
+    }],
+
+    // JSON por test para monitorización en tiempo real
+    ['json', {
+      outputFile: 'results/test-results.json',
+      emit: 'onTestEnd'   // 🔹 cada test actualiza este JSON
+    }],
+
+    // Allure sigue igual
+    ['allure-playwright', { outputFolder: 'allure-results' }],
+  ],
 
   projects: [
     {
