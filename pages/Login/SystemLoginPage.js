@@ -23,14 +23,36 @@ class SystemLoginPage {
     await this.page.locator(this.loginButton).click();
   }
 
-  async esperarLoginExitoso() {
-    // Aquí está la clave:
-    // esperamos el DOM del HOME, no la URL
-    await this.page.locator(this.selectorHome).waitFor({
-      state: 'visible',
-      timeout: 60000
-    });
+ /// async esperarLoginExitoso() {
+ ///   // Aquí está la clave:
+ ///   // esperamos el DOM del HOME, no la URL
+ ///   await this.page.locator(this.selectorHome).waitFor({
+ ///     state: 'visible',
+ ///     timeout: 60000
+ ///   });
+ ///   await this.page.screenshot({ path: 'allure-results/login-fail.png', fullPage: true });
+ /// }
+    async esperarLoginExitoso() {
+  // Esperamos que termine la navegación
+  await this.page.waitForLoadState('networkidle', { timeout: 60000 });
+
+  // Esperamos cualquiera de estas condiciones
+  const home = this.page.locator(this.selectorHome);
+  const error = this.page.locator('.alert-danger, .error, [data-testid="login-error"]');
+
+  await Promise.race([
+    home.waitFor({ state: 'visible', timeout: 60000 }),
+    error.waitFor({ state: 'visible', timeout: 60000 })
+  ]);
+
+  if (await error.isVisible()) {
+    throw new Error('Login falló: mensaje de error visible');
   }
+
+   await this.page.screenshot({ path: 'allure-results/login-fail.png', fullPage: true });
+
+}
+
 }
 
 module.exports = SystemLoginPage;
