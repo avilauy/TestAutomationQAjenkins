@@ -20,7 +20,7 @@ function getNextVersion() {
 module.exports = {
   credentials: {
     user: process.env.TMS_USER || 'cypress',
-    pass: process.env.TMS_PASS || 'Reso0911***'
+    pass: process.env.TMS_PASS || 'Reso0911****'
   },
 
   // Datos para crear nueva aplicación válida
