@@ -7,16 +7,24 @@ USER root
 
 WORKDIR /app
 
-# Copiamos package primero para cache
+# Copiamos solo package para cache
 COPY package*.json ./
 
+# Instalamos dependencias (incluye allure-playwright)
 RUN npm install
+
+# VERIFICACIÓN CLAVE (falla el build si no existe)
+RUN npm list allure-playwright
 
 # Copiamos el resto del proyecto
 COPY . .
 
-# Directorio donde Allure escribe resultados
-RUN mkdir -p /app/allure-results
+# Directorios de salida (se llenan en runtime)
+RUN mkdir -p /app/allure-results /app/test-results
 
-# NO generamos reporte acá
+# Variables de entorno recomendadas
+ENV ALLURE_RESULTS_DIR=/app/allure-results
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+# Comando por defecto
 CMD ["npx", "playwright", "test"]

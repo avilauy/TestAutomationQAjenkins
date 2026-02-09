@@ -4,7 +4,7 @@ const { defineConfig, devices } = require('@playwright/test');
 module.exports = defineConfig({
   testDir: './tests',
 
-  // Ejecutar de a uno (evita timeouts y bloqueos)
+  // Ejecución controlada (ideal para Jenkins)
   workers: 1,
   fullyParallel: false,
 
@@ -18,6 +18,12 @@ module.exports = defineConfig({
     '**/global-setup.js',
   ],
 
+  // REPORTERS
+  reporter: [
+    ['line'],
+    ['allure-playwright', { outputFolder: 'allure-results' }],
+  ],
+
   use: {
     baseURL: 'https://tms-front.test.internal.resonet.uy/',
     storageState: '.playwright/storageState.json',
@@ -28,19 +34,15 @@ module.exports = defineConfig({
 
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
   },
-
-reporter: [
-  ['html', { open: 'never' }],
-  ['allure-playwright', { outputFolder: 'allure-results' }],
-],
 
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    // Firefox y WebKit listos para activar si se necesitan
     // {
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },
