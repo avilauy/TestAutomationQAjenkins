@@ -1,10 +1,24 @@
+// ================================
+// Módulos Node.js
+// ================================
 const fs = require('fs');
 const path = require('path');
 
+// ================================
+// Archivo de control de versión APK
+// ================================
+// Este archivo persiste la última versión usada
+// para evitar colisiones en cargas automatizadas
 const versionFile = path.join(__dirname, '.apkVersion');
 
+// ================================
+// Generador de versión incremental
+// ================================
+// Lee la versión actual desde archivo local,
+// incrementa en +1 y la persiste nuevamente.
+// Retorna formato: "X.0"
 function getNextVersion() {
-  let current = 15;
+  let current = 15; // valor base inicial
 
   if (fs.existsSync(versionFile)) {
     const value = parseInt(fs.readFileSync(versionFile, 'utf8'), 10);
@@ -12,51 +26,76 @@ function getNextVersion() {
   }
 
   const next = current + 1;
+
+  // Persistencia de la nueva versión
   fs.writeFileSync(versionFile, String(next));
 
   return `${next}.0`;
 }
 
+// ================================
+// Exportación de datos de prueba
+// ================================
 module.exports = {
+
+  // ================================
+  // 🔐 Credenciales (deprecadas progresivamente)
+  // ================================
+  // ⚠️ Mantiene compatibilidad con código existente
+  // ⚠️ Fuente: variables de entorno (.env / Jenkins / Docker)
+  // ❗ Recomendación: migrar uso directo a process.env en global-setup
   credentials: {
-    user: process.env.TMS_USER || 'cypress',
-    pass: process.env.TMS_PASS || 'Reso0911****'
+    user: process.env.USER_ADMIN || '',
+    pass: process.env.PASSWORD_ADMIN || ''
   },
 
-  // Datos para crear nueva aplicación válida
+  // ================================
+  // 📦 Datos para creación de aplicación
+  // ================================
   nuevaAppValida: {
     nombre: 'APPTEST27IVAN',
+
+    // Código dinámico para evitar duplicados
     codigo: `9.${Date.now()}`,
+
     CodigoDuplicado: `1.0.0`,
     tipo: '10',        // APKs
     categoria: '14',   // Retail
     descripcion: 'test 27'
   },
 
-  // Caso POSITIVO comprobado busqueda Apliacion 
+  // ================================
+  // 🔍 Datos para búsqueda positiva
+  // ================================
   buscarAppData: {
-    tipo: '10',        // APKs
-    categoria: '14',   // Retail
-    estado: '1'        // Habilitado
+    tipo: '10',
+    categoria: '14',
+    estado: '1' // Habilitado
   },
 
-  // Casos NEGATIVOS filtro busqueda
+  // ================================
+  // ❌ Casos negativos de búsqueda
+  // ================================
   buscarAppNegativos: {
-    tipoErroneo: '11',          // Configurations
-    categoriaErronea: '16',     // Hotel
-    estadoErroneo: '0',         // Deshabilitado
+    tipoErroneo: '11',
+    categoriaErronea: '16',
+    estadoErroneo: '0',
     codigoInexistente: 'ZZZ9999',
     versionesImpossible: '999'
   },
 
-  // test data creacion campana
+  // ================================
+  // 📣 Datos para creación de campaña
+  // ================================
   campananuevo: {
     nombre: 'CAMPAÑATEST12012026IVAN',
     aplicacionValue: '119',
     dispositivoSerie: 'Q29500039478'
   },
 
-  // test data busqueda campana
+  // ================================
+  // 🔎 Datos para búsqueda de campaña
+  // ================================
   buscarcampana: {
     nombrecampana: 'campañanoexiste',
     aplicacion: '119',
@@ -68,21 +107,28 @@ module.exports = {
     fechaHasta: '22/12/2025'
   },
 
-  // -------- APK UPLOAD (NO se cambia la estructura) --------
+  // ================================
+  // 📲 APK Upload (flujo dinámico)
+  // ================================
   subirApk: {
     codigoApp: 'flx1ef',
+
+    // Generación automática de versión única
     version: getNextVersion(),
+
     descripcion: 'Carga automatizada APK FLEX101',
-    nombreApp:'1.0.0emifede'
+    nombreApp: '1.0.0emifede'
   },
 
-VersionDuplicada: {
-  codigoApp: 'flx1ef',
-  version: '370.0',
-  descripcion: 'Carga automatizada APK FLEX101',
-  breveDescripcion: 'Bre',
-  nombreAppDuplicada: '1.0.0emifede'
-}
-
+  // ================================
+  // ⚠️ Caso negativo: versión duplicada
+  // ================================
+  VersionDuplicada: {
+    codigoApp: 'flx1ef',
+    version: '370.0',
+    descripcion: 'Carga automatizada APK FLEX101',
+    breveDescripcion: 'Bre',
+    nombreAppDuplicada: '1.0.0emifede'
+  }
 
 };

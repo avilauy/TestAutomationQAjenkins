@@ -28,3 +28,6 @@ yarn-error.log*
 
 storageState.json
 .apkVersion
+
+.env
+.env.*
