@@ -1,41 +1,79 @@
+// ================================
+// Carga de variables de entorno
+// ================================
+// Permite usar credenciales desde .env en local
+// o desde variables de entorno en CI/CD (Jenkins, Docker)
+require('dotenv').config();
+
 const { chromium } = require('@playwright/test');
 
-//const SystemLoginPage = require('../../pages/Login/SystemLoginPage');
-//const { credentials } = require('../../fixtures/testData');
-
-
+// ================================
+// Page Object del login
+// ================================
 const SystemLoginPage = require('../pages/Login/SystemLoginPage');
-const { credentials } = require('../fixtures/testData');
 
-
+// ================================
+// Setup global de autenticación
+// ================================
+// Este archivo se ejecuta UNA sola vez antes de todos los tests.
+// Su objetivo es:
+// 1. Hacer login técnico
+// 2. Guardar la sesión en storageState
+// 3. Reutilizarla en todos los tests
+// ================================
 module.exports = async () => {
-    
- // const browser = await chromium.launch({ headless: false });
+
+  // ================================
+  // Lanzamiento del navegador
+  // ================================
+  // headless por defecto (ideal para CI)
   const browser = await chromium.launch();
 
   const page = await browser.newPage();
 
+  // Instancia del Page Object
   const loginPage = new SystemLoginPage(page);
 
-  // Ir al login
-  //await page.goto('/');
-  await page.goto('https://tms-front.test.internal.resonet.uy/');
-
-
-  // Reutiliza tu login existente
-  await loginPage.completarCredencialesLogin(
-    credentials.user,
-    credentials.pass
+  // ================================
+  // Navegación al login
+  // ================================
+  // Usa variable de entorno si existe, sino fallback
+  await page.goto(
+    process.env.BASE_URL || 'https://tms-front.test.internal.resonet.uy/'
   );
+
+  // ================================
+  // Credenciales (desde variables de entorno)
+  // ================================
+  //  Importante:
+  // - No usar datos hardcodeados
+  // - No usar fixtures para secretos
+  const user = process.env.USER_ADMIN;
+  const pass = process.env.PASSWORD_ADMIN;
+
+  // Validación defensiva (evita errores silenciosos)
+  if (!user || !pass) {
+    throw new Error('❌ Credenciales no definidas en variables de entorno');
+  }
+
+  // ================================
+  // Flujo de login reutilizable
+  // ================================
+  await loginPage.completarCredencialesLogin(user, pass);
   await loginPage.clickBotonLogin();
   await loginPage.esperarLoginExitoso();
 
-  // Guardar sesión
+  // ================================
+  // Persistencia de sesión
+  // ================================
+  // Guarda cookies y estado autenticado
+  // para reutilizar en todos los tests
   await page.context().storageState({
-   // path: 'storageState.json',
     path: '.playwright/storageState.json',
-
   });
 
+  // ================================
+  // Cierre del navegador
+  // ================================
   await browser.close();
 };

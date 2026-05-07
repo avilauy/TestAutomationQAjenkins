@@ -15,7 +15,8 @@
   "devDependencies": {
     "@playwright/test": "^1.57.0",
     "allure-commandline": "^2.35.1",
-    "allure-playwright": "^3.4.5"
+    "allure-playwright": "^3.4.5",
+    "dotenv": "^17.4.2"
   },
   "dependencies": {
     "uuid": "^13.0.0"
