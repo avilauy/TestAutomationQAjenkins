@@ -1,9 +1,13 @@
 // ================================
 // Carga de variables de entorno
 // ================================
-// Permite usar credenciales desde .env en local
-// o desde variables de entorno en CI/CD (Jenkins, Docker)
-require('dotenv').config();
+// Local: usa archivo .env
+// Jenkins/Docker: usa variables del sistema
+try {
+  require('dotenv').config();
+} catch (error) {
+  console.warn('dotenv no disponible, usando variables del sistema');
+}
 
 const { chromium } = require('@playwright/test');
 
@@ -15,65 +19,83 @@ const SystemLoginPage = require('../pages/Login/SystemLoginPage');
 // ================================
 // Setup global de autenticación
 // ================================
-// Este archivo se ejecuta UNA sola vez antes de todos los tests.
-// Su objetivo es:
-// 1. Hacer login técnico
-// 2. Guardar la sesión en storageState
-// 3. Reutilizarla en todos los tests
+// Este archivo se ejecuta UNA vez antes
+// de todos los tests.
+//
+// Objetivos:
+// 1. Realizar login técnico
+// 2. Persistir sesión autenticada
+// 3. Reutilizar storageState
 // ================================
 module.exports = async () => {
 
   // ================================
-  // Lanzamiento del navegador
+  // Variables de entorno
   // ================================
-  // headless por defecto (ideal para CI)
-  const browser = await chromium.launch();
+  const BASE_URL =
+    process.env.BASE_URL ||
+    'https://tms-front.test.internal.resonet.uy/';
 
-  const page = await browser.newPage();
-
-  // Instancia del Page Object
-  const loginPage = new SystemLoginPage(page);
-
-  // ================================
-  // Navegación al login
-  // ================================
-  // Usa variable de entorno si existe, sino fallback
-  await page.goto(
-    process.env.BASE_URL || 'https://tms-front.test.internal.resonet.uy/'
-  );
+  // Recomendado:
+  // evitar USER/PASSWORD por conflictos SO
+  const user = process.env.TMS_USER;
+  const pass = process.env.TMS_PASSWORD;
 
   // ================================
-  // Credenciales (desde variables de entorno)
+  // Validación defensiva
   // ================================
-  //  Importante:
-  // - No usar datos hardcodeados
-  // - No usar fixtures para secretos
-  const user = process.env.USER_ADMIN;
-  const pass = process.env.PASSWORD_ADMIN;
-
-  // Validación defensiva (evita errores silenciosos)
   if (!user || !pass) {
-    throw new Error('❌ Credenciales no definidas en variables de entorno');
+    console.error('❌ Variables detectadas:');
+    console.error('BASE_URL:', BASE_URL);
+    console.error('TMS_USER:', user ? 'OK' : 'NO DEFINIDO');
+    console.error('TMS_PASSWORD:', pass ? 'OK' : 'NO DEFINIDO');
+
+    throw new Error(
+      '❌ Credenciales no definidas en variables de entorno'
+    );
   }
 
   // ================================
-  // Flujo de login reutilizable
+  // Lanzamiento navegador
+  // ================================
+  const browser = await chromium.launch({
+    headless: true,
+  });
+
+  const page = await browser.newPage();
+
+  // ================================
+  // Instancia Page Object
+  // ================================
+  const loginPage = new SystemLoginPage(page);
+
+  // ================================
+  // Navegación
+  // ================================
+  await page.goto(BASE_URL, {
+    waitUntil: 'networkidle',
+  });
+
+  // ================================
+  // Login reutilizable
   // ================================
   await loginPage.completarCredencialesLogin(user, pass);
+
   await loginPage.clickBotonLogin();
+
   await loginPage.esperarLoginExitoso();
 
   // ================================
   // Persistencia de sesión
   // ================================
-  // Guarda cookies y estado autenticado
-  // para reutilizar en todos los tests
   await page.context().storageState({
     path: '.playwright/storageState.json',
   });
 
+  console.log('✅ storageState generado correctamente');
+
   // ================================
-  // Cierre del navegador
+  // Cierre navegador
   // ================================
   await browser.close();
 };
