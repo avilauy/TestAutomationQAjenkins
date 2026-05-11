@@ -72,7 +72,7 @@ module.exports = defineConfig({
     // ================================
 
     // Ejecuta con UI (cambiar a true en CI si necesitas headless)
-    headless: false,
+    headless: true,
 
     // Resolución estándar de viewport
     viewport: { width: 1280, height: 720 },
